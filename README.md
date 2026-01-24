@@ -57,3 +57,4 @@ supabase/migrations/0001_init.sql
 
 - Create a Vercel project and add the variables from .env.local.
 - Make sure your WeChat IP whitelist allows the Vercel deployment.
+# wechat-cms
