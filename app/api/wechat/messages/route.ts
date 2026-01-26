@@ -35,7 +35,7 @@ export async function GET() {
       status: item.status,
       wechat_media_id: item.wechat_media_id,
       created_at: item.created_at,
-      article_title: item.articles?.title ?? null
+      article_title: item.articles?.[0]?.title ?? null
     }));
 
     return NextResponse.json({ data: payload });
