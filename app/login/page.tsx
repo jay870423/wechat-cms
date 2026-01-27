@@ -15,9 +15,6 @@ export default function LoginPage() {
     >
       <div className="mx-auto max-w-md rounded-[28px] border border-slate-200/70 bg-white/80 p-8 shadow-soft">
         <AuthForm />
-        <p className="mt-6 text-xs text-slate-500">
-          {copy.login.note}
-        </p>
       </div>
     </AppShell>
   );

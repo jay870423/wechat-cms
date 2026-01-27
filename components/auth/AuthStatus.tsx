@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createSupabaseClient } from "@/lib/supabase/client";
 import { useI18n } from "@/components/shared/LocaleProvider";
+import LoginModal from "@/components/auth/LoginModal";
 
 export default function AuthStatus() {
   const router = useRouter();
   const { copy } = useI18n();
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
-  const [loginHref, setLoginHref] = useState("/login");
+  const [modalOpen, setModalOpen] = useState(false);
 
   const supabase = useMemo(() => {
     try {
@@ -20,13 +20,6 @@ export default function AuthStatus() {
     } catch {
       return null;
     }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const path = window.location.pathname + window.location.search;
-    const redirectTarget = path.startsWith("/") ? path : "/dashboard";
-    setLoginHref(`/login?redirectedFrom=${encodeURIComponent(redirectTarget)}`);
   }, []);
 
   useEffect(() => {
@@ -56,7 +49,6 @@ export default function AuthStatus() {
   async function handleSignOut() {
     if (!supabase) return;
     await supabase.auth.signOut();
-    router.push("/login");
     router.refresh();
   }
 
@@ -66,9 +58,16 @@ export default function AuthStatus() {
 
   if (!user) {
     return (
-      <Link className="transition hover:text-ink" href={loginHref}>
-        {copy.nav.login}
-      </Link>
+      <>
+        <button
+          className="text-sm font-semibold text-slate-700 transition hover:text-ink"
+          type="button"
+          onClick={() => setModalOpen(true)}
+        >
+          {copy.nav.login}
+        </button>
+        <LoginModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      </>
     );
   }
 
