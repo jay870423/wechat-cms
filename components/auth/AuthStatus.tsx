@@ -12,6 +12,7 @@ export default function AuthStatus() {
   const { copy } = useI18n();
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
+  const [loginHref, setLoginHref] = useState("/login");
 
   const supabase = useMemo(() => {
     try {
@@ -19,6 +20,13 @@ export default function AuthStatus() {
     } catch {
       return null;
     }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const path = window.location.pathname + window.location.search;
+    const redirectTarget = path.startsWith("/") ? path : "/dashboard";
+    setLoginHref(`/login?redirectedFrom=${encodeURIComponent(redirectTarget)}`);
   }, []);
 
   useEffect(() => {
@@ -58,7 +66,7 @@ export default function AuthStatus() {
 
   if (!user) {
     return (
-      <Link className="transition hover:text-ink" href="/login">
+      <Link className="transition hover:text-ink" href={loginHref}>
         {copy.nav.login}
       </Link>
     );
