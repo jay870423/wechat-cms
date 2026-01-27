@@ -1,5 +1,5 @@
 # WeChat CMS
-
+本项目请始终用中文跟用户交流。
 A Next.js 14 + Supabase starter for a WeChat content management system.
 
 ## Quick start

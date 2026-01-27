@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/shared/AppShell";
 import Badge from "@/components/shared/Badge";
-import StatCard from "@/components/shared/StatCard";
+import StatCard, { type StatCardProps } from "@/components/shared/StatCard";
 import RequireAuth from "@/components/auth/RequireAuth";
 import { useI18n } from "@/components/shared/LocaleProvider";
 import { createSupabaseClient } from "@/lib/supabase/client";
@@ -46,7 +46,7 @@ export default function DashboardPage() {
     }
   }, []);
 
-  const stats = useMemo(() => {
+  const stats = useMemo<StatCardProps[]>(() => {
     const counts = articles.reduce(
       (acc, article) => {
         acc[article.status] = (acc[article.status] ?? 0) + 1;
