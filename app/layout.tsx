@@ -12,7 +12,8 @@ const spaceGrotesk = Space_Grotesk({
 const newsreader = Newsreader({
   subsets: ["latin"],
   variable: "--font-serif",
-  display: "swap"
+  display: "swap",
+  adjustFontFallback: false
 });
 
 export const metadata: Metadata = {
