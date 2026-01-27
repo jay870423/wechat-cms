@@ -8,7 +8,7 @@ const redirectCookieOptions: CookieOptions = {
   path: "/",
   maxAge: 60 * 5,
   sameSite: "lax",
-  httpOnly: true
+  httpOnly: false
 };
 
 type BufferedCookie = {
@@ -37,8 +37,13 @@ function applyBufferedCookies(response: NextResponse, cookies: BufferedCookie[])
 export async function GET(request: NextRequest) {
   const provider = request.nextUrl.searchParams.get("provider") as Provider | null;
   const redirectedFrom = request.nextUrl.searchParams.get("redirectedFrom");
+  const cookieRedirect = request.cookies.get(redirectCookieName)?.value;
   const redirectPath =
-    redirectedFrom && redirectedFrom.startsWith("/") ? redirectedFrom : "/dashboard";
+    redirectedFrom && redirectedFrom.startsWith("/")
+      ? redirectedFrom
+      : cookieRedirect && cookieRedirect.startsWith("/")
+        ? cookieRedirect
+        : "/dashboard";
 
   if (!provider || !allowedProviders.has(provider)) {
     return NextResponse.redirect(new URL("/login", request.url));

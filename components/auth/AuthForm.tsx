@@ -16,6 +16,7 @@ type Message = {
 };
 
 const defaultRedirect = "/dashboard";
+const redirectCookieName = "auth-redirect";
 
 export default function AuthForm() {
   const router = useRouter();
@@ -28,15 +29,34 @@ export default function AuthForm() {
   const [redirectParam, setRedirectParam] = useState(defaultRedirect);
   const [oauthError, setOauthError] = useState(false);
 
+  const resolveRedirectTarget = () => {
+    if (typeof window === "undefined") return defaultRedirect;
+    const params = new URLSearchParams(window.location.search);
+    const redirectedFrom = params.get("redirectedFrom");
+    if (redirectedFrom && redirectedFrom.startsWith("/")) {
+      return redirectedFrom;
+    }
+    const referrer = document.referrer;
+    if (referrer) {
+      try {
+        const refUrl = new URL(referrer);
+        if (refUrl.origin === window.location.origin) {
+          const path = `${refUrl.pathname}${refUrl.search}`;
+          if (path.startsWith("/")) {
+            return path;
+          }
+        }
+      } catch {
+        // Ignore invalid referrer.
+      }
+    }
+    return defaultRedirect;
+  };
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    const redirectedFrom = params.get("redirectedFrom");
-    const safeRedirect =
-      redirectedFrom && redirectedFrom.startsWith("/")
-        ? redirectedFrom
-        : defaultRedirect;
-    setRedirectParam(safeRedirect);
+    setRedirectParam(resolveRedirectTarget());
     setOauthError(Boolean(params.get("error")));
   }, []);
 
@@ -98,6 +118,18 @@ export default function AuthForm() {
     setBusy(false);
   }
 
+  const handleOAuthClick = (provider: "google" | "github") => (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (typeof window === "undefined") return;
+    const redirectTarget = resolveRedirectTarget();
+    document.cookie = `${redirectCookieName}=${encodeURIComponent(
+      redirectTarget
+    )}; Path=/; Max-Age=300; SameSite=Lax`;
+    window.location.href = `/auth/login?provider=${provider}&redirectedFrom=${encodeURIComponent(
+      redirectTarget
+    )}`;
+  };
+
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
       {oauthError ? (
@@ -112,6 +144,7 @@ export default function AuthForm() {
           href={`/auth/login?provider=google&redirectedFrom=${encodeURIComponent(
             redirectParam
           )}`}
+          onClick={handleOAuthClick("google")}
         >
           {copy.auth.continueGoogle}
         </a>
@@ -120,6 +153,7 @@ export default function AuthForm() {
           href={`/auth/login?provider=github&redirectedFrom=${encodeURIComponent(
             redirectParam
           )}`}
+          onClick={handleOAuthClick("github")}
         >
           {copy.auth.continueGithub}
         </a>
