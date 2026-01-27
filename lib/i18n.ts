@@ -275,7 +275,7 @@ export const messages = {
   }
 } as const;
 
-export type Messages = typeof messages.en;
+export type Messages = (typeof messages)[Locale];
 
 export function getWordCountLabel(locale: Locale, count: number) {
   if (locale === "zh") {
