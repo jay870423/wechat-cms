@@ -15,7 +15,7 @@ type Message = {
   text: string;
 };
 
-const defaultRedirect = "/dashboard";
+const defaultRedirect = "/";
 const redirectCookieName = "auth-redirect";
 
 export default function AuthForm() {

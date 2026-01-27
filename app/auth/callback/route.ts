@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       ? redirectedFrom
       : cookieRedirect && cookieRedirect.startsWith("/")
         ? cookieRedirect
-        : "/dashboard";
+        : "/";
 
   const clearRedirectCookie = (response: NextResponse) => {
     response.cookies.set({ name: redirectCookieName, value: "", maxAge: 0, path: "/" });

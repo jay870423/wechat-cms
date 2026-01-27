@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       ? redirectedFrom
       : cookieRedirect && cookieRedirect.startsWith("/")
         ? cookieRedirect
-        : "/dashboard";
+        : "/";
 
   if (!provider || !allowedProviders.has(provider)) {
     return NextResponse.redirect(new URL("/login", request.url));
