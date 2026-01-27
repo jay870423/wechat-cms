@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createSupabaseClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -15,19 +15,30 @@ type Message = {
   text: string;
 };
 
+const defaultRedirect = "/dashboard";
+
 export default function AuthForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { copy } = useI18n();
   const [mode, setMode] = useState<AuthMode>("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
+  const [redirectParam, setRedirectParam] = useState(defaultRedirect);
+  const [oauthError, setOauthError] = useState(false);
 
-  const redirectedFrom = searchParams.get("redirectedFrom");
-  const redirectParam =
-    redirectedFrom && redirectedFrom.startsWith("/") ? redirectedFrom : "/dashboard";
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const redirectedFrom = params.get("redirectedFrom");
+    const safeRedirect =
+      redirectedFrom && redirectedFrom.startsWith("/")
+        ? redirectedFrom
+        : defaultRedirect;
+    setRedirectParam(safeRedirect);
+    setOauthError(Boolean(params.get("error")));
+  }, []);
 
   const supabase = useMemo(() => {
     try {
@@ -89,7 +100,7 @@ export default function AuthForm() {
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
-      {searchParams.get("error") ? (
+      {oauthError ? (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-700">
           {copy.auth.oauthError}
         </div>
